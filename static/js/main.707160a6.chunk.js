@@ -1,0 +1,2 @@
+(this.webpackJsonpGuestbook=this.webpackJsonpGuestbook||[]).push([[0],{3:function(e,t,n){e.exports=n(8)},8:function(e,t,n){"use strict";n.r(t);var o=n(0),u=n.n(o),r=n(2),s=function(){return u.a.createElement("h1",null,"Guestbook")};n.n(r).a.render(u.a.createElement(s,null),document.getElementById("root"))}},[[3,1,2]]]);
+//# sourceMappingURL=main.707160a6.chunk.js.map
