@@ -6,16 +6,19 @@ import { COMMENT_FORM_FIELDS } from '../../helpers';
 import * as api from '../../helpers/api';
 import * as store from '../../store';
 import './AddComment.scss';
-import errorReducer, * as errorAction from './errorReducer';
-import formDataReducer, * as formAction from './formDataReducer';
+import errorReducer, * as errors from './errorReducer';
+import formDataReducer, * as form from './formDataReducer';
+import statusReducer, * as status from './statusReducer';
+import { PopUp } from '../PopUp';
 
 export const AddComment = (): ReactElement => {
   const dispatch = useDispatch();
-  const [formData, setFormData] = useReducer(formDataReducer, formAction.initialFormData);
-  const [errorMessages, setErrorMessages] = useReducer(errorReducer, errorAction.initialErrors);
+  const [formData, setFormData] = useReducer(formDataReducer, form.initialFormData);
+  const [errorMessages, setErrorMessages] = useReducer(errorReducer, errors.initialErrors);
+  const [statusMessages, setStatus] = useReducer(statusReducer, status.initialStatus);
 
   useEffect(() => {
-    setFormData(formAction.setFieldData('id', uuidv4()));
+    setFormData(form.setFieldData('id', uuidv4()));
   }, []);
 
   const validateField = (name: string, value: string): boolean => {
@@ -23,7 +26,7 @@ export const AddComment = (): ReactElement => {
       (validator: Validator) => validator(name, value),
     ).filter(Boolean) || [''];
 
-    setErrorMessages(errorAction.addError(name, allErrorMessages[0]));
+    setErrorMessages(errors.addError(name, allErrorMessages[0]));
 
     return Boolean(allErrorMessages[0]);
   };
@@ -45,13 +48,13 @@ export const AddComment = (): ReactElement => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
     const { name, value } = e.target;
 
-    setFormData(formAction.setFieldData(name, value));
+    setFormData(form.setFieldData(name, value));
   };
 
   const handleFocus = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
     const { name } = e.target;
 
-    setErrorMessages(errorAction.removeError(name));
+    setErrorMessages(errors.removeError(name));
   };
 
   const handleBlur = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
@@ -74,11 +77,26 @@ export const AddComment = (): ReactElement => {
       date: (new Date()).getTime(),
     };
 
-    await api.postData(comment);
+    try {
+      const res = await api.postData(comment);
+      const titleMessage = `Thanks ${res.author}!`;
+      const bodyMessage = 'Your message was added.';
 
-    setFormData(formAction.clearData());
-    setFormData(formAction.setFieldData('id', uuidv4()));
+      setStatus(status.setStatusSuccess(titleMessage, bodyMessage));
+    } catch (err) {
+      const titleMessage = 'Oops...';
+      const bodyMessage = `Something went wrong. ${err}`;
+
+      setStatus(status.setStatusError(titleMessage, bodyMessage));
+    }
+
+    setFormData(form.clearData());
+    setFormData(form.setFieldData('id', uuidv4()));
     dispatch(store.loadComments());
+  };
+
+  const clearStatus = () => {
+    setStatus(status.clearStatus());
   };
 
   return (
@@ -89,6 +107,7 @@ export const AddComment = (): ReactElement => {
             type="text"
             className={cn('AddComment__Field', { 'AddComment__Field--error': errorMessages.author })}
             name={COMMENT_FORM_FIELDS.author.fieldName}
+            placeholder={COMMENT_FORM_FIELDS.author.label}
             value={formData.author}
             onChange={handleChange}
             onFocus={handleFocus}
@@ -105,6 +124,7 @@ export const AddComment = (): ReactElement => {
             rows={5}
             className={cn('AddComment__Field', { 'AddComment__Field--error': errorMessages.comment })}
             name={COMMENT_FORM_FIELDS.comment.fieldName}
+            placeholder={COMMENT_FORM_FIELDS.comment.label}
             value={formData.comment}
             onChange={handleChange}
             onFocus={handleFocus}
@@ -120,6 +140,9 @@ export const AddComment = (): ReactElement => {
           Submit
         </button>
       </form>
+      {statusMessages.statusType && (
+        <PopUp message={statusMessages} handleClick={clearStatus} />
+      )}
     </section>
   );
 };

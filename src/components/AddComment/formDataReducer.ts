@@ -30,7 +30,7 @@ const errorReducer = (state = initialFormData, action: AvailableActions) => {
       };
 
     case CLEAR_DATA:
-      return initialFormData;
+      return { ...initialFormData };
 
     default:
       return state;

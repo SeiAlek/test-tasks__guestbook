@@ -1,7 +1,10 @@
 @import '../../styles/utils/index.scss';
 
 .Comments {
-  &__List {}
+  &__List {
+    margin: 0;
+  }
+
   &__Item {
     list-style: none;
   }

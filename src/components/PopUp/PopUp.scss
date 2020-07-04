@@ -1,0 +1,52 @@
+@import '../../styles/index.scss';
+
+.PopUp {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba($color: $color-dark, $alpha: 0.8);
+
+  &__Container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 30rem;
+    width: 100%;
+    padding: 2rem 3rem;
+    text-align: center;
+    color: $color-dark;
+    background-color: #fff;
+    border: 1px solid $color-dark;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1.5rem $color-light;
+    z-index: 2;
+  }
+
+  &__Title {
+    text-transform: uppercase;
+  }
+
+  &__Body {
+    margin: 1rem 0 2rem;
+  }
+
+  &__Button {
+    width: 10rem;
+    padding: 0.5rem;
+    @include button($color-dark);
+  }
+
+  &--error {
+    & .PopUp__Container {
+      color: $color-danger;
+      border-color: $color-danger;
+    }
+
+    & .PopUp__Button {
+      @include button($color-danger);
+    }
+  }
+}

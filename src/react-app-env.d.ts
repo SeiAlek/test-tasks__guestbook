@@ -19,4 +19,10 @@ interface FormField {
   validators: Validator[];
 }
 
+interface AddStatus {
+  statusType: string;
+  title: string;
+  body: string;
+}
+
 type Validator = (name: string, value: string) => string;

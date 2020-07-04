@@ -23,3 +23,56 @@
     }
   }
 }
+
+@mixin button($_color) {
+  position: relative;
+  display: inline-block;
+  margin: 0 auto;
+  font-size: 14px;
+  line-height: 1rem;
+  letter-spacing: 0.05em;
+  text-align: center;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: $_color;
+  border: 1px solid $_color;
+  background-color: #fff;
+  outline: none;
+  cursor: pointer;
+
+  &::after,
+  &::before {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 20px;
+    height: 3px;
+    background-color: #fff;
+    transition: all 0.3s;
+  }
+
+  &::before {
+    content: "";
+    top: -2px;
+    right: 5%;
+  }
+
+  &::after {
+    content: "";
+    bottom: -2px;
+    left: 10px;
+  }
+
+  &:hover,
+  &:focus {
+    &::before {
+      width: 50%;
+      right: 25%;
+    }
+
+    &::after {
+      width: 50%;
+      left: 25%;
+    }
+  }
+}
