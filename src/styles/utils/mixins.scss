@@ -1,0 +1,25 @@
+@mixin hoverAndFocus($_heightLine, $_beforeColor, $_afterColor) {
+  position: relative;
+  transition: all 0.6s;
+  outline: none;
+
+  &:before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: $_heightLine;
+    background: $_beforeColor;
+    transition: all 0.3s;
+  }
+
+  &:hover,
+  &:focus {
+    &:before {
+      left: 0;
+      width: 100%;
+      background: $_afterColor;
+    }
+  }
+}

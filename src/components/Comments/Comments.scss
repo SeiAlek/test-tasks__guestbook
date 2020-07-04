@@ -1,0 +1,39 @@
+@import '../../styles/utils/index.scss';
+
+.Comments {
+  &__List {}
+  &__Item {
+    list-style: none;
+  }
+}
+
+.CommentsItem {
+  position: relative;
+  border: 1px solid $color-dark;
+  border-radius: 0.25rem;
+  margin: 2rem 0;
+  padding: 2rem 2rem 1rem;
+
+  &__Author {
+    position: absolute;
+    padding: 0.24rem 1rem;
+    color: $color-light;
+    background-color: $color-dark;
+    border-radius: 0.25rem;
+    top: 0;
+    transform: translateY(-50%);
+  }
+
+  &__Date {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.5rem 2rem;
+    font-size: 12px;
+    font-style: italic;
+  }
+
+  &__Text {
+    @extend %paragraph;
+  }
+}

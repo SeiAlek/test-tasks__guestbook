@@ -1,8 +1,22 @@
 // / <reference types="react-scripts" />
 
-interface Comment {
+interface CommentItem {
   id: string;
-  userId: string;
-  title: string;
-  body: string;
+  date: number;
+  author: string;
+  comment: string;
 }
+
+interface FormFields {
+  [key: string]: FormField;
+}
+
+interface FormField {
+  fieldName: string;
+  label: string;
+  placeholder?: string;
+  autoComplete?: string;
+  validators: Validator[];
+}
+
+type Validator = (name: string, value: string) => string;
