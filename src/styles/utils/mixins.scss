@@ -76,3 +76,9 @@
     }
   }
 }
+
+@mixin error {
+  color:  $color-danger;
+  background-color: rgba($color: $color-danger, $alpha: 0.05);
+  border: 1px solid $color-danger;
+}
