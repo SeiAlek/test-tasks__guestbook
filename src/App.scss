@@ -1,0 +1,19 @@
+@import './styles/index.scss';
+
+.App {
+  text-align: center;
+
+  &__Error {
+    @extend %error;
+  }
+
+  &__ErrorBody {
+    margin: 1rem 0 2rem;
+  }
+
+  &__Button {
+    @include button($color-danger);
+    width: 10rem;
+    padding: 1.5rem;
+  }
+}

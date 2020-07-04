@@ -28,6 +28,7 @@ export const getComments = (state: RootState) => (
 export const loadComments = () => {
   return async (dispatch: Dispatch<any>) => {
     dispatch(startLoading());
+    dispatch(setErrorMessage(''));
 
     try {
       const data = await api.getData<CommentItem>();

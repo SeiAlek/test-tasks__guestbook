@@ -33,9 +33,7 @@
     }
 
     &--error {
-      color:  $color-danger;
-      background-color: rgba($color: $color-danger, $alpha: 0.05);
-      border-color: $color-danger;
+      @extend %error;
     }
   }
 
