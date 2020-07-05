@@ -5,7 +5,7 @@ const REMOVE_ERROR_MESSAGE = 'REMOVE_ERROR_MESSAGE';
 
 export const initialErrors = {
   author: '',
-  comment: '',
+  body: '',
 };
 
 type AddError = Action<typeof ADD_ERROR_MESSAGE> & { fieldName: string; message: string };

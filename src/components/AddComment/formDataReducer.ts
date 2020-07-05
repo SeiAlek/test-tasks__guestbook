@@ -4,9 +4,8 @@ const SET_DATA = 'SET_DATA';
 const CLEAR_DATA = 'CLEAR_DATA';
 
 export const initialFormData = {
-  id: '',
   author: '',
-  comment: '',
+  body: '',
 };
 
 type SetData = Action<typeof SET_DATA> & { fieldName: string; fieldValue: string };

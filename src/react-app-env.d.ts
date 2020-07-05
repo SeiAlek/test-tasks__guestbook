@@ -4,7 +4,7 @@ interface CommentItem {
   id: string;
   date: number;
   author: string;
-  comment: string;
+  body: string;
 }
 
 interface FormFields {

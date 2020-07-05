@@ -1,13 +1,6 @@
 import * as validator from './validators';
 
 export const COMMENT_FORM_FIELDS: FormFields = {
-  id: {
-    fieldName: 'id',
-    label: 'ID',
-    validators: [
-      validator.required,
-    ],
-  },
   author: {
     fieldName: 'author',
     label: 'Name',
@@ -15,16 +8,16 @@ export const COMMENT_FORM_FIELDS: FormFields = {
     validators: [
       validator.required,
       validator.minLength(2),
-      validator.maxLength(60),
+      validator.maxLength(20),
     ],
   },
-  comment: {
-    fieldName: 'comment',
+  body: {
+    fieldName: 'body',
     label: 'Comment',
     validators: [
       validator.required,
       validator.minLength(5),
-      validator.maxLength(200),
+      validator.maxLength(500),
     ],
   },
 };

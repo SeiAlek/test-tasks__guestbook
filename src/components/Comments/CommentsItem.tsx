@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useCallback } from 'react';
 
 interface Props {
   comment: CommentItem;
@@ -7,11 +7,11 @@ interface Props {
 export const CommentsItem = ({ comment }: Props): ReactElement => {
   const { author, date } = comment;
 
-  const addZero = (num: number): string => {
+  const addZero = useCallback((num: number): string => {
     return num < 10 ? `0${num}` : `${num}`;
-  };
+  }, []);
 
-  const formatTime = (ms: number): string => {
+  const formatTime = useCallback((ms: number): string => {
     const time = new Date(ms);
     const year = time.getFullYear();
     const month = Number(time.getMonth()) + 1;
@@ -20,7 +20,7 @@ export const CommentsItem = ({ comment }: Props): ReactElement => {
     const minutes = time.getMinutes();
 
     return `${addZero(day)}.${addZero(month)}.${addZero(year)} ${addZero(hours)}:${addZero(minutes)}`;
-  };
+  }, [addZero]);
 
   return (
     <article className="CommentsItem">
@@ -31,7 +31,7 @@ export const CommentsItem = ({ comment }: Props): ReactElement => {
         {formatTime(date)}
       </div>
       <div className="CommentsItem__Text">
-        {comment.comment}
+        {comment.body}
       </div>
     </article>
   );

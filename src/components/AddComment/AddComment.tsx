@@ -1,25 +1,39 @@
-import React, { ReactElement, useEffect, useReducer } from 'react';
+import React, {
+  ReactElement, useCallback, useMemo, useReducer,
+} from 'react';
 import cn from 'classnames';
-import { useDispatch } from 'react-redux';
-import { v4 as uuidv4 } from 'uuid';
+import { useMutation } from '@apollo/react-hooks';
 import { COMMENT_FORM_FIELDS } from '../../helpers';
-import * as api from '../../helpers/api';
-import * as store from '../../store';
+
 import './AddComment.scss';
+import { PopUp } from '../PopUp';
+import { commentsQuery } from '../Comments/queries';
+import { addCommentMutation } from './mutations';
 import errorReducer, * as errors from './errorReducer';
 import formDataReducer, * as form from './formDataReducer';
 import statusReducer, * as status from './statusReducer';
-import { PopUp } from '../PopUp';
+
+interface NewCommentData {
+  addComment: CommentItem;
+}
+
+interface NewCommentItem {
+  author: string;
+  body: string;
+  date: number;
+}
 
 export const AddComment = (): ReactElement => {
-  const dispatch = useDispatch();
   const [formData, setFormData] = useReducer(formDataReducer, form.initialFormData);
   const [errorMessages, setErrorMessages] = useReducer(errorReducer, errors.initialErrors);
   const [statusMessages, setStatus] = useReducer(statusReducer, status.initialStatus);
+  const { author, body } = COMMENT_FORM_FIELDS;
 
-  useEffect(() => {
-    setFormData(form.setFieldData('id', uuidv4()));
-  }, []);
+  const [addComment, { error, loading }] = useMutation<NewCommentData, NewCommentItem>(
+    addCommentMutation,
+  );
+
+  const ready = useMemo(() => !error && !loading, [error, loading]);
 
   const validateField = (name: string, value: string): boolean => {
     const allErrorMessages = COMMENT_FORM_FIELDS[name].validators.map(
@@ -31,19 +45,22 @@ export const AddComment = (): ReactElement => {
     return Boolean(allErrorMessages[0]);
   };
 
-  const validateAll = (): boolean => {
-    let hasError = false;
+  const validateAll = useCallback(
+    (): boolean => {
+      let hasError = false;
 
-    Object.entries(formData).forEach(([fieldName, fieldValue]) => {
-      const isInvalid = validateField(fieldName, fieldValue);
+      Object.entries(formData).forEach(([fieldName, fieldValue]) => {
+        const isInvalid = validateField(fieldName, fieldValue);
 
-      if (isInvalid) {
-        hasError = true;
-      }
-    });
+        if (isInvalid) {
+          hasError = true;
+        }
+      });
 
-    return !hasError;
-  };
+      return !hasError;
+    },
+    [formData],
+  );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
     const { name, value } = e.target;
@@ -60,54 +77,58 @@ export const AddComment = (): ReactElement => {
   const handleBlur = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
     const { value, name } = e.target;
 
+    setFormData(form.setFieldData(name, value.trim()));
     validateField(name, value);
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
 
-    if (!validateAll()) {
-      return;
-    }
+      if (!validateAll()) {
+        return;
+      }
 
-    const comment = {
-      id: formData.id,
-      author: formData.author,
-      comment: formData.comment,
-      date: (new Date()).getTime(),
-    };
+      try {
+        const res = await addComment({
+          variables: {
+            author: formData.author,
+            body: formData.body,
+            date: (new Date()).getTime(),
+          },
+          refetchQueries: [{
+            query: commentsQuery,
+          }],
+        });
+        const titleMessage = `Thanks ${res.data?.addComment.author}!`;
+        const bodyMessage = 'Your comment was posted.';
 
-    try {
-      const res = await api.postData(comment);
-      const titleMessage = `Thanks ${res.author}!`;
-      const bodyMessage = 'Your message was added.';
+        setStatus(status.setStatusSuccess(titleMessage, bodyMessage));
+      } catch (err) {
+        const titleMessage = 'Oops...';
+        const bodyMessage = `Something went wrong. ${err}`;
 
-      setStatus(status.setStatusSuccess(titleMessage, bodyMessage));
-    } catch (err) {
-      const titleMessage = 'Oops...';
-      const bodyMessage = `Something went wrong. ${err}`;
+        setStatus(status.setStatusError(titleMessage, bodyMessage));
+      }
 
-      setStatus(status.setStatusError(titleMessage, bodyMessage));
-    }
+      setFormData(form.clearData());
+    },
+    [addComment, validateAll, formData.author, formData.body],
+  );
 
-    setFormData(form.clearData());
-    setFormData(form.setFieldData('id', uuidv4()));
-    dispatch(store.loadComments());
-  };
-
-  const clearStatus = () => {
-    setStatus(status.clearStatus());
-  };
+  const clearStatus = useCallback(
+    () => setStatus(status.clearStatus()), [],
+  );
 
   return (
     <section className="AddComment">
       <form className="AddComment__Form" onSubmit={handleSubmit}>
-        <label htmlFor={COMMENT_FORM_FIELDS.author.fieldName} className="AddComment__Label">
+        <label htmlFor={author.fieldName} className="AddComment__Label">
           <input
             type="text"
             className={cn('AddComment__Field', { 'AddComment__Field--error': errorMessages.author })}
-            name={COMMENT_FORM_FIELDS.author.fieldName}
-            placeholder={COMMENT_FORM_FIELDS.author.label}
+            name={author.fieldName}
+            placeholder={author.label}
             value={formData.author}
             onChange={handleChange}
             onFocus={handleFocus}
@@ -119,20 +140,20 @@ export const AddComment = (): ReactElement => {
             </div>
           )}
         </label>
-        <label htmlFor={COMMENT_FORM_FIELDS.comment.fieldName} className="AddComment__Label">
+        <label htmlFor={body.fieldName} className="AddComment__Label">
           <textarea
             rows={5}
-            className={cn('AddComment__Field', { 'AddComment__Field--error': errorMessages.comment })}
-            name={COMMENT_FORM_FIELDS.comment.fieldName}
-            placeholder={COMMENT_FORM_FIELDS.comment.label}
-            value={formData.comment}
+            className={cn('AddComment__Field', { 'AddComment__Field--error': errorMessages.body })}
+            name={body.fieldName}
+            placeholder={body.label}
+            value={formData.body}
             onChange={handleChange}
             onFocus={handleFocus}
             onBlur={handleBlur}
           />
-          {errorMessages.comment && (
+          {errorMessages.body && (
             <div className="AddComment__Error">
-              {errorMessages.comment}
+              {errorMessages.body}
             </div>
           )}
         </label>
@@ -140,9 +161,11 @@ export const AddComment = (): ReactElement => {
           Submit
         </button>
       </form>
-      {statusMessages.statusType && (
-        <PopUp message={statusMessages} handleClick={clearStatus} />
+
+      {ready && statusMessages.statusType && (
+        <PopUp {...statusMessages} handleClick={clearStatus} />
       )}
+
     </section>
   );
 };

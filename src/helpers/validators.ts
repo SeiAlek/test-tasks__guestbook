@@ -1,5 +1,5 @@
 export const required: Validator = (name, value) => {
-  if (value) {
+  if (value.trim()) {
     return '';
   }
 
@@ -8,7 +8,7 @@ export const required: Validator = (name, value) => {
 
 export const minLength = (length: number): Validator => {
   return (name, value) => {
-    return !value || ((value as string).length >= length)
+    return !value || ((value as string).trim().length >= length)
       ? ''
       : `The ${name} should have at least ${length} characters.`;
   };
@@ -16,7 +16,7 @@ export const minLength = (length: number): Validator => {
 
 export const maxLength = (length: number): Validator => {
   return (name, value) => {
-    return !value || ((value as string).length <= length)
+    return !value || ((value as string).trim().length <= length)
       ? ''
       : `The ${name} should have no more ${length} characters.`;
   };
