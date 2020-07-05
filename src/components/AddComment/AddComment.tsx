@@ -32,7 +32,6 @@ export const AddComment = (): ReactElement => {
   const [addComment, { error, loading }] = useMutation<NewCommentData, NewCommentItem>(
     addCommentMutation,
   );
-
   const ready = useMemo(() => !error && !loading, [error, loading]);
 
   const validateField = (name: string, value: string): boolean => {

@@ -1,5 +1,5 @@
-import { useSubscription } from '@apollo/react-hooks';
 import React, { ReactElement } from 'react';
+import { useQuery } from '@apollo/react-hooks';
 
 import './Comments.scss';
 import { AddComment } from '../AddComment';
@@ -12,7 +12,7 @@ interface CommentData {
 }
 
 export const Comments = (): ReactElement => {
-  const { loading, data } = useSubscription<CommentData>(commentsQuery);
+  const { loading, data } = useQuery<CommentData>(commentsQuery);
 
   return (
     <section className="Comments">
